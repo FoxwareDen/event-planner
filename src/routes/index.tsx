@@ -1,3 +1,5 @@
+import { BookingForm } from "@/components/booking-form";
+import { Hero } from "@/components/hero";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
@@ -5,5 +7,8 @@ export const Route = createFileRoute("/")({
 });
 
 function App() {
-  return <></>;
+  return <>
+    <Hero />
+    <BookingForm />
+  </>;
 }
