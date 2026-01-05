@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { redirect } from "@tanstack/react-router";
 
+
 export type PermType = "user" | "admin" | "moderator";
 
 export async function checkAuthtozition(privilege: PermType) {

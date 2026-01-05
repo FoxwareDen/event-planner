@@ -2,6 +2,8 @@ import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 
 import Header from "../components/Header";
 import "../index.css"; // import normally, no ?url
+import { useEffect } from "react";
+import { createClientConnection } from "../lib/db";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -16,6 +18,15 @@ export const Route = createRootRoute({
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+
+  useEffect(() => {
+    const result = createClientConnection();
+
+    if (!result) {
+      throw new Error("failed to connect to supabase client")
+    }
+  }, [])
+
   return (
     <html lang="en">
       <head>
