@@ -1,6 +1,30 @@
 import { create } from "zustand";
 import { redirect } from "@tanstack/react-router";
+import { db } from "./db";
 
+export async function login(redirectTo?: string): Promise<boolean> {
+  try {
+    // @ts-ignore
+    const { data, error } = await db.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        scopes: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email",
+        redirectTo: redirectTo || location.href
+      }
+    });
+
+    if (error) throw error;
+
+    setAuthSession({
+      privilege: "user",
+    });
+
+    return true;
+  } catch (error) {
+    console.error(`{error}`);
+    return false;
+  }
+}
 
 export type PermType = "user" | "admin" | "moderator";
 
@@ -55,6 +79,15 @@ export const useAuthSession = create<boop>()((set) => ({
       isAuthenticated: false,
     })),
 }));
+
+export function setAuthSession(session: UserSession) {
+  useAuthSession.setState({
+    user: {
+      privilege: session.privilege
+    },
+    isAuthenticated: true
+  });
+}
 
 export function getAuthSession() {
   return useAuthSession.getState(); // NOT a hook
