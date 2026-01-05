@@ -17,6 +17,11 @@ export interface MetaData {
   created_at: Date
 }
 
+const tableNames: Record<string, string> = {
+  'data': 'event-data',
+  'tickets': "event-tickets"
+};
+
 export interface Ticket {
   fullName: string,
   email: string,
@@ -27,7 +32,7 @@ export interface Ticket {
 export interface Event {
   ticket_id: Number,
   type: string,
-  date: Date,
+  date: string,
   number_of_guests: Number,
   number_of_chairs: Number,
   number_of_tables: Number,
@@ -36,10 +41,47 @@ export interface Event {
   requests?: string
 }
 
-const tableNames: Record<string, string> = {
-  'data': 'event-data',
-  'tickets': "event-tickets"
-};
+export type CreateTicketPayload = Ticket & Event
 
+// TODO: add for validation
+export async function createTicket(eventData: {} & Ticket & Event): Promise<boolean> {
+  try {
+    if (!db) throw Error("Failed to connect to database");
+
+    const { data: ticket, error: ticketError } = await db
+      .from('event-tickets')
+      .insert({
+        full_name: eventData.fullName,
+        email: eventData.email,
+        phone_number: eventData.phoneNumber,
+        status: eventData.status
+      })
+      .select()
+      .single();
+
+    if (ticketError) throw ticketError
+
+    const { error: eventError } = await db
+      .from('event-data')
+      .insert({
+        ticket_id: ticket.id,
+        type: eventData.type,
+        date: eventData.date,
+        number_of_guests: eventData.number_of_guests,
+        number_of_chairs: eventData.number_of_chairs,
+        number_of_tables: eventData.number_of_tables,
+        catering: eventData.catering ?? false,
+        services: eventData.services,
+        requests: eventData.requests,
+      });
+
+    if (eventError) throw eventError
+
+    return true
+  } catch (error) {
+    console.error(error)
+    return false;
+  }
+}
 
 // TODO: make a function to subscribe to the realtime database
