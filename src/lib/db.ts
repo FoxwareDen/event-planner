@@ -8,7 +8,7 @@ export function createClientConnection(): boolean {
     db = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
     return true;
   } catch (error) {
-    console.error(`{error}`);
+    console.error(`${error}`);
     return false;
   }
 }
@@ -30,11 +30,10 @@ export interface Ticket {
 }
 
 export interface Event {
-  ticket_id: number,
   type: string,
   date: string,
-  number_of_chairs: number,
   number_of_guests: number,
+  number_of_chairs: number,
   number_of_tables: number,
   catering: boolean,
   services?: string[],
@@ -44,17 +43,17 @@ export interface Event {
 export type CreateTicketPayload = Ticket & Event
 
 // TODO: add for validation
-export async function createTicket(eventData: {} & Ticket & Event): Promise<boolean> {
+export async function createTicket(ticketData: Ticket, eventData: Event): Promise<boolean> {
   try {
     if (!db) throw Error("Failed to connect to database");
 
     const { data: ticket, error: ticketError } = await db
       .from('event-tickets')
       .insert({
-        full_name: eventData.fullName,
-        email: eventData.email,
-        phone_number: eventData.phoneNumber,
-        status: eventData.status
+        full_name: ticketData.fullName,
+        email: ticketData.email,
+        phone_number: ticketData.phoneNumber,
+        status: ticketData.status
       })
       .select()
       .single();
@@ -75,13 +74,49 @@ export async function createTicket(eventData: {} & Ticket & Event): Promise<bool
         requests: eventData.requests,
       });
 
-    if (eventError) throw eventError
+    if (eventError) throw eventError;
 
-    return true
+    return true;
   } catch (error) {
-    console.error(error)
+    console.error(`${error}`);
     return false;
   }
 }
 
+export async function getTickets<T>(): Promise<T[]> {
+  try {
+    if (!db) throw Error("Failed to connect to database");
+
+    const { data, error } = await db.from("event-tickets").select();
+
+    if (error) throw error;
+
+    return data as T[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
 // TODO: make a function to subscribe to the realtime database
+export function getTicketsRealtime(func: (newValue: Record<string, any>, oldValue: Partial<Record<string, any>>) => void): () => void {
+  if (!db) throw Error("Failed to connect to database");
+
+  const channel = db.channel('event-tickets-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'event-tickets'
+      },
+      (payload) => {
+        func(payload.new, payload.old);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    db?.removeChannel(channel);
+  }
+}
