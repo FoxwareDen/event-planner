@@ -8,12 +8,12 @@ export function createClientConnection(): boolean {
     db = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
     return true;
   } catch (error) {
-    console.error(`{error}`);
+    console.error(`${error}`);
     return false;
   }
 }
 export interface MetaData {
-  id: number,
+  id: Number,
   created_at: Date
 }
 
@@ -30,12 +30,12 @@ export interface Ticket {
 }
 
 export interface Event {
-  ticket_id: number,
+  ticket_id: Number,
   type: string,
   date: string,
-  number_of_chairs: number,
-  number_of_guests: number,
-  number_of_tables: number,
+  number_of_guests: Number,
+  number_of_chairs: Number,
+  number_of_tables: Number,
   catering: boolean,
   services?: string[],
   requests?: string
@@ -75,13 +75,49 @@ export async function createTicket(eventData: {} & Ticket & Event): Promise<bool
         requests: eventData.requests,
       });
 
-    if (eventError) throw eventError
+    if (eventError) throw eventError;
 
-    return true
+    return true;
   } catch (error) {
-    console.error(error)
+    console.error(`${error}`);
     return false;
   }
 }
 
+export async function getTickets<T>(): Promise<T[]> {
+  try {
+    if (!db) throw Error("Failed to connect to database");
+
+    const { data, error } = await db.from("event-tickets").select();
+
+    if (error) throw error;
+
+    return data as T[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
 // TODO: make a function to subscribe to the realtime database
+export function getTicketsRealtime(func: (newValue: Record<string, any>, oldValue: Partial<Record<string, any>>) => void): () => void {
+  if (!db) throw Error("Failed to connect to database");
+
+  const channel = db.channel('event-tickets-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'event-tickets'
+      },
+      (payload) => {
+        func(payload.new, payload.old);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    db?.removeChannel(channel);
+  }
+}
