@@ -13,7 +13,7 @@ export function createClientConnection(): boolean {
   }
 }
 export interface MetaData {
-  id: Number,
+  id: number,
   created_at: Date
 }
 
@@ -30,12 +30,11 @@ export interface Ticket {
 }
 
 export interface Event {
-  ticket_id: Number,
   type: string,
   date: string,
-  number_of_guests: Number,
-  number_of_chairs: Number,
-  number_of_tables: Number,
+  number_of_guests: number,
+  number_of_chairs: number,
+  number_of_tables: number,
   catering: boolean,
   services?: string[],
   requests?: string
@@ -44,17 +43,17 @@ export interface Event {
 export type CreateTicketPayload = Ticket & Event
 
 // TODO: add for validation
-export async function createTicket(eventData: {} & Ticket & Event): Promise<boolean> {
+export async function createTicket(ticketData: Ticket, eventData: Event): Promise<boolean> {
   try {
     if (!db) throw Error("Failed to connect to database");
 
     const { data: ticket, error: ticketError } = await db
       .from('event-tickets')
       .insert({
-        full_name: eventData.fullName,
-        email: eventData.email,
-        phone_number: eventData.phoneNumber,
-        status: eventData.status
+        full_name: ticketData.fullName,
+        email: ticketData.email,
+        phone_number: ticketData.phoneNumber,
+        status: ticketData.status
       })
       .select()
       .single();
