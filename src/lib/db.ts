@@ -13,7 +13,7 @@ export function createClientConnection(): boolean {
   }
 }
 export interface MetaData {
-  id: Number,
+  id: number,
   created_at: Date
 }
 
@@ -30,12 +30,12 @@ export interface Ticket {
 }
 
 export interface Event {
-  ticket_id: Number,
+  ticket_id: number,
   type: string,
   date: string,
-  number_of_guests: Number,
-  number_of_chairs: Number,
-  number_of_tables: Number,
+  number_of_chairs: number,
+  number_of_guests: number,
+  number_of_tables: number,
   catering: boolean,
   services?: string[],
   requests?: string
