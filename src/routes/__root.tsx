@@ -1,8 +1,8 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 
 import "../index.css"; // import normally, no ?url
-import { useEffect } from "react";
-import { createClientConnection } from "../lib/db";
+import { useEffect, useState } from "react";
+import { createClientConnection, getTickets, getTicketsRealtime, type Ticket } from "../lib/db";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 

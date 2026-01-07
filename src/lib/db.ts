@@ -17,11 +17,6 @@ export interface MetaData {
   created_at: Date
 }
 
-const tableNames: Record<string, string> = {
-  'data': 'event-data',
-  'tickets': "event-tickets"
-};
-
 export interface Ticket {
   fullName: string,
   email: string,
@@ -83,6 +78,14 @@ export async function createTicket(ticketData: Ticket, eventData: Event): Promis
   }
 }
 
+/**
+ * Retrieves all tickets from the database
+ * @template T - Type to cast the returned ticket data to
+ * @returns {Promise<T[]>} Array of tickets cast to the specified type, empty array on error
+ * @throws {Error} If database connection is not established
+ * @example
+ * const tickets = await getTickets<Ticket & MetaData>();
+ */
 export async function getTickets<T>(): Promise<T[]> {
   try {
     if (!db) throw Error("Failed to connect to database");
@@ -98,8 +101,21 @@ export async function getTickets<T>(): Promise<T[]> {
   }
 }
 
-// TODO: make a function to subscribe to the realtime database
-export function getTicketsRealtime(func: (newValue: Record<string, any>, oldValue: Partial<Record<string, any>>) => void): () => void {
+/**
+ * Sets up a realtime subscription to ticket changes in the database
+ * @param {function} func - Callback function invoked when ticket data changes
+ * @param {Record<string, any>} func.newValue - The new/updated record data
+ * @param {Partial<Record<string, any>>} [func.oldValue] - The previous record data (for updates/deletes)
+ * @param {string} [func.typeEvent] - Type of database event ('INSERT', 'UPDATE', 'DELETE')
+ * @returns {function(): void} Unsubscribe function to stop listening to changes
+ * @throws {Error} If database connection is not established
+ * @example
+ * const unsubscribe = getTicketsRealtime((newValue, oldValue, eventType) => {
+ *   console.log(`Ticket ${eventType}:`, newValue);
+ * });
+ * // Later: unsubscribe();
+ */
+export function getTicketsRealtime(func: (newValue: Record<string, any>, oldValue?: Partial<Record<string, any>>, typeEvent?: string) => void): () => void {
   if (!db) throw Error("Failed to connect to database");
 
   const channel = db.channel('event-tickets-changes')
@@ -111,7 +127,7 @@ export function getTicketsRealtime(func: (newValue: Record<string, any>, oldValu
         table: 'event-tickets'
       },
       (payload) => {
-        func(payload.new, payload.old);
+        func(payload.new, payload.old, payload.eventType);
       }
     )
     .subscribe();
