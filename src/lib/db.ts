@@ -8,7 +8,7 @@ export function createClientConnection(): boolean {
     db = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
     return true;
   } catch (error) {
-    console.error(`{error}`);
+    console.error(error);
     return false;
   }
 }
@@ -17,10 +17,10 @@ export interface MetaData {
   created_at: Date
 }
 
-const tableNames: Record<string, string> = {
-  'data': 'event-data',
-  'tickets': "event-tickets"
-};
+// const tableNames: Record<string, string> = {
+//   'data': 'event-data',
+//   'tickets': "event-tickets"
+// };
 
 export interface Ticket {
   fullName: string,
