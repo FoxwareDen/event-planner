@@ -93,8 +93,8 @@ export async function getTickets<T>(): Promise<T[]> {
 /**
  * Sets up a realtime subscription to ticket changes in the database
  * @param {function} func - Callback function invoked when ticket data changes
- * @param {Record<string, any>} func.newValue - The new/updated record data
- * @param {Partial<Record<string, any>>} [func.oldValue] - The previous record data (for updates/deletes)
+ * @param {Record<string, T>} func.newValue - The new/updated record data
+ * @param {Partial<Record<string, T>>} [func.oldValue] - The previous record data (for updates/deletes)
  * @param {string} [func.typeEvent] - Type of database event ('INSERT', 'UPDATE', 'DELETE')
  * @returns {function(): void} Unsubscribe function to stop listening to changes
  * @throws {Error} If database connection is not established
@@ -104,7 +104,7 @@ export async function getTickets<T>(): Promise<T[]> {
  * });
  * // Later: unsubscribe();
  */
-export function getTicketsRealtime(func: (newValue: Record<string, any>, oldValue?: Partial<Record<string, any>>, typeEvent?: string) => void): () => void {
+export function getTicketsRealtime<T>(func: (newValue: Record<string, T>, oldValue?: Partial<Record<string, T>>, typeEvent?: string) => void): () => void {
   if (!db) throw Error("Failed to connect to database");
 
   const channel = db.channel('event-tickets-changes')
