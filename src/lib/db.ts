@@ -12,6 +12,7 @@ export function createClientConnection(): boolean {
     return false;
   }
 }
+
 export interface MetaData {
   id: number,
   created_at: Date
@@ -24,18 +25,6 @@ export interface Ticket {
   status: "pending" | "active" | "complete" | "canceled"
 }
 
-export interface Event {
-  type: string,
-  date: string,
-  number_of_guests: number,
-  number_of_chairs: number,
-  number_of_tables: number,
-  catering: boolean,
-  services?: string[],
-  requests?: string
-}
-
-export type CreateTicketPayload = Ticket & Event
 
 // TODO: add for validation
 export async function createTicket(ticketData: Ticket, eventData: Event): Promise<boolean> {
@@ -136,3 +125,45 @@ export function getTicketsRealtime(func: (newValue: Record<string, any>, oldValu
     db?.removeChannel(channel);
   }
 }
+
+export interface Event {
+  type: string,
+  date: string,
+  number_of_guests: number,
+  number_of_chairs: number,
+  number_of_tables: number,
+  catering: boolean,
+  services?: string[],
+  requests?: string
+}
+
+export async function getEventData<T>(ticket_id: number): Promise<null | T> {
+  try {
+    if (!db) throw Error("Failed to connect to database");
+
+    const { data, error } = await db.from("event-data").select("*").eq("ticket_id", ticket_id).single();
+
+    if (error) throw error;
+
+    return data as T
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function getAllEvents<T>(): Promise<T[]> {
+  try {
+    if (!db) throw Error("Failed to connect to database");
+
+    const { data, error } = await db.from("event-data").select("*");
+
+    if (error) throw error;
+
+    return data as T[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
