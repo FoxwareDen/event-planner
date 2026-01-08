@@ -8,19 +8,15 @@ export function createClientConnection(): boolean {
     db = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
     return true;
   } catch (error) {
-    console.error(error);
+    console.error(`${error}`);
     return false;
   }
 }
+
 export interface MetaData {
   id: number,
   created_at: Date
 }
-
-// const tableNames: Record<string, string> = {
-//   'data': 'event-data',
-//   'tickets': "event-tickets"
-// };
 
 export interface Ticket {
   fullName: string,
@@ -29,32 +25,19 @@ export interface Ticket {
   status: "pending" | "active" | "complete" | "canceled"
 }
 
-export interface Event {
-  ticket_id: number,
-  type: string,
-  date: string,
-  number_of_chairs: number,
-  number_of_guests: number,
-  number_of_tables: number,
-  catering: boolean,
-  services?: string[],
-  requests?: string
-}
-
-export type CreateTicketPayload = Ticket & Event
 
 // TODO: add for validation
-export async function createTicket(eventData: {} & Ticket & Event): Promise<boolean> {
+export async function createTicket(ticketData: Ticket, eventData: Event): Promise<boolean> {
   try {
     if (!db) throw Error("Failed to connect to database");
 
     const { data: ticket, error: ticketError } = await db
       .from('event-tickets')
       .insert({
-        full_name: eventData.fullName,
-        email: eventData.email,
-        phone_number: eventData.phoneNumber,
-        status: eventData.status
+        full_name: ticketData.fullName,
+        email: ticketData.email,
+        phone_number: ticketData.phoneNumber,
+        status: ticketData.status
       })
       .select()
       .single();
@@ -75,13 +58,112 @@ export async function createTicket(eventData: {} & Ticket & Event): Promise<bool
         requests: eventData.requests,
       });
 
-    if (eventError) throw eventError
+    if (eventError) throw eventError;
 
-    return true
+    return true;
   } catch (error) {
-    console.error(error)
+    console.error(`${error}`);
     return false;
   }
 }
 
-// TODO: make a function to subscribe to the realtime database
+/**
+ * Retrieves all tickets from the database
+ * @template T - Type to cast the returned ticket data to
+ * @returns {Promise<T[]>} Array of tickets cast to the specified type, empty array on error
+ * @throws {Error} If database connection is not established
+ * @example
+ * const tickets = await getTickets<Ticket & MetaData>();
+ */
+export async function getTickets<T>(): Promise<T[]> {
+  try {
+    if (!db) throw Error("Failed to connect to database");
+
+    const { data, error } = await db.from("event-tickets").select();
+
+    if (error) throw error;
+
+    return data as T[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+/**
+ * Sets up a realtime subscription to ticket changes in the database
+ * @param {function} func - Callback function invoked when ticket data changes
+ * @param {Record<string, any>} func.newValue - The new/updated record data
+ * @param {Partial<Record<string, any>>} [func.oldValue] - The previous record data (for updates/deletes)
+ * @param {string} [func.typeEvent] - Type of database event ('INSERT', 'UPDATE', 'DELETE')
+ * @returns {function(): void} Unsubscribe function to stop listening to changes
+ * @throws {Error} If database connection is not established
+ * @example
+ * const unsubscribe = getTicketsRealtime((newValue, oldValue, eventType) => {
+ *   console.log(`Ticket ${eventType}:`, newValue);
+ * });
+ * // Later: unsubscribe();
+ */
+export function getTicketsRealtime(func: (newValue: Record<string, any>, oldValue?: Partial<Record<string, any>>, typeEvent?: string) => void): () => void {
+  if (!db) throw Error("Failed to connect to database");
+
+  const channel = db.channel('event-tickets-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'event-tickets'
+      },
+      (payload) => {
+        func(payload.new, payload.old, payload.eventType);
+      }
+    )
+    .subscribe();
+
+  return () => {
+    db?.removeChannel(channel);
+  }
+}
+
+export interface Event {
+  type: string,
+  date: string,
+  number_of_guests: number,
+  number_of_chairs: number,
+  number_of_tables: number,
+  catering: boolean,
+  services?: string[],
+  requests?: string
+}
+
+export async function getEventData<T>(ticket_id: number): Promise<null | T> {
+  try {
+    if (!db) throw Error("Failed to connect to database");
+
+    const { data, error } = await db.from("event-data").select("*").eq("ticket_id", ticket_id).single();
+
+    if (error) throw error;
+
+    return data as T
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function getAllEvents<T>(): Promise<T[]> {
+  try {
+    if (!db) throw Error("Failed to connect to database");
+
+    const { data, error } = await db.from("event-data").select("*");
+
+    if (error) throw error;
+
+    return data as T[];
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+

@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { createTicket, type Event, type Ticket } from "@/lib/db"
 
 export function BookingForm() {
   const [additionalServices, setAdditionalServices] = useState<string[]>([])
@@ -18,24 +19,37 @@ export function BookingForm() {
     setAdditionalServices((prev) => (prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]))
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+    const form = e.currentTarget;
     e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    const data = {
-      fullName: formData.get("fullName"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-      eventType: formData.get("eventType"),
-      eventDate: formData.get("eventDate"),
-      guests: formData.get("guests"),
-      chairs: formData.get("chairs"),
-      tables: formData.get("tables"),
-      catering: formData.get("catering"),
-      additionalServices,
-      specialRequests: formData.get("specialRequests"),
-    }
-    console.log("Form submitted:", data)
+    const formData = new FormData(e.currentTarget);
+
+    const ticket = {
+      fullName: formData.get("fullName") as string,
+      email: formData.get("email") as string,
+      phoneNumber: formData.get("phone") as string,
+      status: "pending"
+    } as Ticket;
+
+    const eventData = {
+      type: formData.get("eventType") as string | "",
+      date: formData.get("eventDate") as string | "",
+      number_of_guests: Number(formData.get("guests")),
+      number_of_chairs: Number(formData.get("chairs")),
+      number_of_tables: Number(formData.get("tables")),
+      catering: formData.get("catering") == "yes" ? true : false,
+      services: additionalServices,
+      requests: formData.get("specialRequests") as string
+    } as Event;
     // Handle form submission
+
+    // TODO: added loading animation
+    const res = await createTicket(ticket, eventData);
+
+    if (res) {
+      form.reset()
+    }
   }
 
   return (
