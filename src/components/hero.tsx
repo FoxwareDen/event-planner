@@ -85,10 +85,25 @@ export function Hero() {
             animate="visible"
           >
             <motion.h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight text-balance"
+              className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-balance"
               variants={itemVariants}
             >
-              Create Unforgettable Moments
+              <motion.span
+                className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent"
+                animate={{
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+                style={{
+                  backgroundSize: "200% 200%"
+                }}
+              >
+                Create Unforgettable Moments
+              </motion.span>
             </motion.h1>
             
             <motion.p
