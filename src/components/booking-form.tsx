@@ -179,7 +179,7 @@ export function BookingForm() {
                   name="phone"
                   type="tel"
                   required
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="+27 76 000 00"
                   className="border-gray-300 focus:border-[#D4AF37] focus:ring-[#D4AF37] rounded-none"
                 />
               </div>
