@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button"
+import { motion } from "motion/react"
 
+const MotionBtn = motion.create(Button);
 export function Hero() {
+
   return (
     <section className="relative py-10 md:py-20 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,12 +17,12 @@ export function Hero() {
               occasion. Make every moment count.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90 px-8">
+              <MotionBtn size="lg" className="bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90 px-8" whileHover={{scale: 1.1}}>
                 Explore Events
-              </Button>
-              <Button size="lg" variant="outline" className="cursor-pointer">
+              </MotionBtn>
+              <MotionBtn size="lg" variant="outline" className="cursor-pointer" whileHover={{scale: 1.1}}>
                 Learn More
-              </Button>
+              </MotionBtn>
             </div>
           </div>
         </div>

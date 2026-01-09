@@ -11,6 +11,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { createTicket, type Event, type Ticket } from "@/lib/db"
+import { motion } from "motion/react"
+
+const MotionBtn = motion.create(Button);
 
 export function BookingForm() {
   const [additionalServices, setAdditionalServices] = useState<string[]>([])
@@ -254,12 +257,12 @@ export function BookingForm() {
             </div>
           </div>
 
-          <Button
+          <MotionBtn
             type="submit"
-            className="w-full bg-[#D4AF37] hover:bg-[#C5A028] text-black font-bold py-6 text-lg rounded-none"
+            className="w-full bg-[#D4AF37] hover:bg-[#C5A028] text-black font-bold py-6 text-lg rounded-none cursor-pointer" whileHover={{scale:1.1}}
           >
             Submit Booking Request
-          </Button>
+          </MotionBtn>
         </form>
       </div>
     </section>

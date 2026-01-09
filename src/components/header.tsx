@@ -2,7 +2,10 @@ import { Link } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
 import { Menu } from "lucide-react"
 import { useState } from "react"
+import { motion } from "motion/react"
 
+
+ const MotionButton = motion.create(Button);
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -17,10 +20,10 @@ export function Header() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" className="hidden cursor-pointer md:flex border-2">
+            <MotionButton variant="ghost" className=" btn hidden cursor-pointer md:flex border-2" whileHover={{scale: 1.1}}>
               Sign In
-            </Button>
-            <Button className="hidden md:flex bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90">Book Now</Button>
+            </MotionButton>
+            <MotionButton className="hidden md:flex bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90" whileHover={{scale: 1.1}}>Book Now</MotionButton>
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               <Menu className="h-6 w-6" />
               <span className="sr-only">Menu</span>
@@ -32,10 +35,10 @@ export function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-4 space-y-4">
             <div className="pt-4 flex flex-col space-y-2">
-              <Button variant="ghost" className="w-full border-2  cursor-pointer border-primary text-bolder text-lg">
+              <MotionButton variant="ghost" className=" btn w-full border-2  cursor-pointer border-primary text-bolder text-lg" whileHover={{scale: 1.1}}>
                 Sign In
-              </Button>
-              <Button className="w-full bg-primary text-white cursor-pointer hover:bg-primary/90">Book Now</Button>
+              </MotionButton>
+              <MotionButton className="w-full bg-primary text-white cursor-pointer hover:bg-primary/90" whileHover={{scale: 1.1}}>Book Now</MotionButton>
             </div>
           </div>
         )}
