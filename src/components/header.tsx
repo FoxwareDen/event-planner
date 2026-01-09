@@ -15,7 +15,7 @@ export function Header() {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-foreground">Book Your Event</span>
+              <span className="text-2xl font-serif font-bold text-foreground">Book Your Event</span>
             </Link>
           </div>
 
