@@ -51,11 +51,11 @@ export function Testimonials() {
                 </div>
                 <p className="text-muted-foreground leading-relaxed text-pretty">"{testimonial.content}"</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-border">
-                  <img
+                  {/* <img
                     src={testimonial.image || "/placeholder.svg"}
                     alt={testimonial.name}
                     className="w-12 h-12 rounded-full object-cover"
-                  />
+                  /> */}
                   <div>
                     <div className="font-semibold text-foreground">{testimonial.name}</div>
                     <div className="text-sm text-muted-foreground">{testimonial.role}</div>
