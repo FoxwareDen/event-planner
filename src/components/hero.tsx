@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { motion } from "motion/react"
+import celebration from "../assets/celebration.png"
 
 const MotionBtn = motion.create(Button);
 
@@ -17,7 +18,7 @@ export function Hero() {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0},
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
@@ -28,7 +29,7 @@ export function Hero() {
   };
 
   const buttonContainerVariants = {
-    hidden: { opacity: 0 },
+    hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
@@ -132,7 +133,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <motion.div
-              className="w-full h-96 bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl"
+              className="w-full h-96 bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl overflow-hidden relative"
               animate={{
                 rotate: [0, 2, 0, -2, 0],
               }}
@@ -141,7 +142,15 @@ export function Hero() {
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
-            />
+            >
+              <img 
+                src={celebration} 
+                alt="Celebration" 
+                className="w-full h-full object-cover"
+              />
+              {/* Optional overlay for better blend */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent mix-blend-overlay" />
+            </motion.div>
           </motion.div>
         </div>
       </div>
