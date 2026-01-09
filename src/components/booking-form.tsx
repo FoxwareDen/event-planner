@@ -15,13 +15,14 @@ import { motion } from "motion/react"
 
 const MotionBtn = motion.create(Button);
 
+
+
 export function BookingForm() {
   const [additionalServices, setAdditionalServices] = useState<string[]>([])
 
   const handleServiceToggle = (service: string) => {
     setAdditionalServices((prev) => (prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]))
   }
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const form = e.currentTarget;
     e.preventDefault()
@@ -87,7 +88,7 @@ export function BookingForm() {
   };
 
   return (
-    <section className="py-24 px-4 bg-white relative overflow-hidden">
+    <section className="py-24 px-4 bg-white relative overflow-hidden" id="target-section">
       {/* Animated background elements */}
       <motion.div
         className="absolute top-0 right-0 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl"
@@ -122,7 +123,7 @@ export function BookingForm() {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
         >
-          <h2 className="text-4xl font-bold mb-4 text-black">Book Your Event</h2>
+          <h2 className="text-6xl font-bold mb-4 text-primary">Book Your Event</h2>
           <p className="text-lg text-gray-600">Fill out the form below and we'll get back to you shortly</p>
         </motion.div>
 
@@ -361,6 +362,7 @@ export function BookingForm() {
             </MotionBtn>
           </motion.div>
         </motion.form>
+        
       </div>
     </section>
   )

@@ -5,6 +5,13 @@ import celebration from "../assets/celebration.png"
 const MotionBtn = motion.create(Button);
 
 export function Hero() {
+
+    //Scroll to section functionality
+    const scrollToSection = () => {
+      document.getElementById("target-section")?.scrollIntoView({ behavior: "smooth"});
+    }
+  
+
   // Animation variants for staggered children
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -119,13 +126,14 @@ export function Hero() {
               variants={buttonContainerVariants}
             >
               <MotionBtn
+                onClick={scrollToSection}
                 size="lg"
                 className="bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90 px-8"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                Explore Events
+                Book now
               </MotionBtn>
               <MotionBtn
                 size="lg"
