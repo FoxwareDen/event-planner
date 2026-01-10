@@ -11,6 +11,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { createTicket, type Event, type Ticket } from "@/lib/db"
+import { motion } from "motion/react"
+import { sendEmail } from "@/lib/email.model"
+
+const MotionBtn = motion.create(Button);
 
 export function BookingForm() {
   const [additionalServices, setAdditionalServices] = useState<string[]>([])
@@ -20,7 +24,6 @@ export function BookingForm() {
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-
     const form = e.currentTarget;
     e.preventDefault()
     const formData = new FormData(e.currentTarget);
@@ -42,27 +45,111 @@ export function BookingForm() {
       services: additionalServices,
       requests: formData.get("specialRequests") as string
     } as Event;
-    // Handle form submission
 
-    // TODO: added loading animation
     const res = await createTicket(ticket, eventData);
 
     if (res) {
-      form.reset()
+
+      const { error, data } = await sendEmail(import.meta.env.VITE_TO_EMAIL, { ...ticket, ...eventData });
+      if (!error) {
+        console.log(data);
+        form.reset()
+      } else {
+        // TODO: add better feedback for 
+        console.error(error)
+      }
     }
   }
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+      }
+    }
+  };
+
+  const headerVariants = {
+    hidden: { opacity: 0, y: -20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.7,
+      }
+    }
+  };
+
   return (
-    <section className="py-24 px-4 bg-white">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
+    <section className="py-24 px-4 bg-white relative overflow-hidden">
+      {/* Animated background elements */}
+      <motion.div
+        className="absolute top-0 right-0 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl"
+        animate={{
+          y: [0, -40, 0],
+          x: [0, 30, 0],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      <motion.div
+        className="absolute bottom-0 left-0 w-80 h-80 bg-[#D4AF37]/5 rounded-full blur-3xl"
+        animate={{
+          y: [0, 40, 0],
+          x: [0, -30, 0],
+        }}
+        transition={{
+          duration: 10,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+
+      <div className="max-w-3xl mx-auto relative z-10">
+        <motion.div
+          className="text-center mb-12"
+          variants={headerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
           <h2 className="text-4xl font-bold mb-4 text-black">Book Your Event</h2>
           <p className="text-lg text-gray-600">Fill out the form below and we'll get back to you shortly</p>
-        </div>
+        </motion.div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <motion.form
+          onSubmit={handleSubmit}
+          className="space-y-8"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+        >
           {/* Personal Information Section */}
-          <div className="border border-gray-200 p-8">
+          <motion.div
+            className="border border-gray-200 p-8"
+            variants={sectionVariants}
+            whileHover={{ boxShadow: "0 4px 20px rgba(212, 175, 55, 0.1)" }}
+            transition={{ duration: 0.3 }}
+          >
             <h3 className="text-xl font-bold mb-6 text-black">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -106,10 +193,15 @@ export function BookingForm() {
                 />
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Event Details Section */}
-          <div className="border border-gray-200 p-8">
+          <motion.div
+            className="border border-gray-200 p-8"
+            variants={sectionVariants}
+            whileHover={{ boxShadow: "0 4px 20px rgba(212, 175, 55, 0.1)" }}
+            transition={{ duration: 0.3 }}
+          >
             <h3 className="text-xl font-bold mb-6 text-black">Event Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -191,10 +283,15 @@ export function BookingForm() {
                 />
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Services Section */}
-          <div className="border border-gray-200 p-8">
+          <motion.div
+            className="border border-gray-200 p-8"
+            variants={sectionVariants}
+            whileHover={{ boxShadow: "0 4px 20px rgba(212, 175, 55, 0.1)" }}
+            transition={{ duration: 0.3 }}
+          >
             <h3 className="text-xl font-bold mb-6 text-black">Services</h3>
 
             <div className="space-y-6">
@@ -235,10 +332,15 @@ export function BookingForm() {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Special Requests Section */}
-          <div className="border border-gray-200 p-8">
+          <motion.div
+            className="border border-gray-200 p-8"
+            variants={sectionVariants}
+            whileHover={{ boxShadow: "0 4px 20px rgba(212, 175, 55, 0.1)" }}
+            transition={{ duration: 0.3 }}
+          >
             <h3 className="text-xl font-bold mb-6 text-black">Special Requests</h3>
             <div className="space-y-2">
               <Label htmlFor="specialRequests" className="text-sm font-semibold text-black">
@@ -252,15 +354,22 @@ export function BookingForm() {
                 className="border-gray-300 focus:border-[#D4AF37] focus:ring-[#D4AF37] rounded-none resize-none"
               />
             </div>
-          </div>
+          </motion.div>
 
-          <Button
-            type="submit"
-            className="w-full bg-[#D4AF37] hover:bg-[#C5A028] text-black font-bold py-6 text-lg rounded-none"
+          <motion.div
+            variants={sectionVariants}
           >
-            Submit Booking Request
-          </Button>
-        </form>
+            <MotionBtn
+              type="submit"
+              className="w-full bg-[#D4AF37] hover:bg-[#C5A028] text-black font-bold py-6 text-lg rounded-none cursor-pointer"
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
+            >
+              Submit Booking Request
+            </MotionBtn>
+          </motion.div>
+        </motion.form>
       </div>
     </section>
   )
