@@ -42,11 +42,12 @@ function mapToEmailData(input: Ticket & Event): EmailTemplateData {
   };
 }
 
-export async function sendEmail(ticket: Ticket & Event): Promise<{ data: string | null, error: Error | null }> {
+
+export async function sendEmail(to_email: string, ticket: Ticket & Event): Promise<{ data: string | null, error: Error | null }> {
   try {
     const emailData = mapToEmailData(ticket);
 
-    const result = await emailjs.send(EMAIL_SERVICE_ID, EMAIL_TEMPLATE_ID, emailData);
+    const result = await emailjs.send(EMAIL_SERVICE_ID, EMAIL_TEMPLATE_ID, { to_email, ...emailData });
 
     if (result.status != 200) {
       return {

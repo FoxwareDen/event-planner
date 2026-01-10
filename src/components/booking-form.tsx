@@ -50,7 +50,7 @@ export function BookingForm() {
 
     if (res) {
 
-      const { error, data } = await sendEmail({ ...ticket, ...eventData });
+      const { error, data } = await sendEmail(import.meta.env.VITE_TO_EMAIL, { ...ticket, ...eventData });
       if (!error) {
         console.log(data);
         form.reset()
