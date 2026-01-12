@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { createTicket, type Event, type Ticket } from "@/lib/db"
 import { motion } from "motion/react"
+import { sendEmail } from "@/lib/email.model"
 
 const MotionBtn = motion.create(Button);
 
@@ -49,7 +50,15 @@ export function BookingForm() {
     const res = await createTicket(ticket, eventData);
 
     if (res) {
-      form.reset()
+
+      const { error, data } = await sendEmail(import.meta.env.VITE_TO_EMAIL, { ...ticket, ...eventData });
+      if (!error) {
+        console.log(data);
+        form.reset()
+      } else {
+        // TODO: add better feedback for 
+        console.error(error)
+      }
     }
   }
 

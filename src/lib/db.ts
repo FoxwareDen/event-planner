@@ -8,7 +8,7 @@ export function createClientConnection(): boolean {
     db = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
     return true;
   } catch (error) {
-    console.error(`${error}`);
+    console.error(`${JSON.stringify(error)}`);
     return false;
   }
 }
@@ -62,7 +62,7 @@ export async function createTicket(ticketData: Ticket, eventData: Event): Promis
 
     return true;
   } catch (error) {
-    console.error(`${error}`);
+    console.error(`${JSON.stringify(error)}`);
     return false;
   }
 }
@@ -85,7 +85,7 @@ export async function getTickets<T>(): Promise<T[]> {
 
     return data as T[];
   } catch (error) {
-    console.error(error);
+    console.error(`${JSON.stringify(error)}`);;
     return [];
   }
 }
@@ -147,7 +147,7 @@ export async function getEventData<T>(ticket_id: number): Promise<null | T> {
 
     return data as T
   } catch (error) {
-    console.error(error);
+    console.error(`${JSON.stringify(error)}`);;
     return null;
   }
 }
@@ -162,7 +162,7 @@ export async function getAllEvents<T>(): Promise<T[]> {
 
     return data as T[];
   } catch (error) {
-    console.error(error);
+    console.error(`${JSON.stringify(error)}`);;
     return [];
   }
 }
