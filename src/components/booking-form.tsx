@@ -11,8 +11,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { createTicket, type Event, type Ticket } from "@/lib/db"
-import { motion } from "motion/react"
+import { motion, AnimatePresence } from "motion/react"
 import { sendEmail } from "@/lib/email.model"
+import { CheckCircle2 } from "lucide-react"
 
 const MotionBtn = motion.create(Button);
 
@@ -20,6 +21,7 @@ const MotionBtn = motion.create(Button);
 
 export function BookingForm() {
   const [additionalServices, setAdditionalServices] = useState<string[]>([])
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
 
   const handleServiceToggle = (service: string) => {
     setAdditionalServices((prev) => (prev.includes(service) ? prev.filter((s) => s !== service) : [...prev, service]))
@@ -55,6 +57,8 @@ export function BookingForm() {
       if (!error) {
         console.log(data);
         form.reset()
+        setAdditionalServices([])
+        setShowSuccessModal(true)
       } else {
         // TODO: add better feedback for 
         console.error(error)
@@ -373,6 +377,67 @@ export function BookingForm() {
         </motion.form>
         
       </div>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <motion.div
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowSuccessModal(false)}
+          >
+            <motion.div
+              className="bg-white p-8 md:p-12 max-w-md w-full text-center relative"
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              transition={{ type: "spring", duration: 0.5 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              >
+                <CheckCircle2 className="w-24 h-24 text-green-500 mx-auto mb-6" />
+              </motion.div>
+              
+              <motion.h3
+                className="text-3xl font-bold mb-4 text-black"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                Booking Submitted Successfully!
+              </motion.h3>
+              
+              <motion.p
+                className="text-gray-600 text-lg mb-8"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                Thank you for your booking request. We will contact you soon regarding your event details.
+              </motion.p>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <Button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="bg-[#D4AF37] hover:bg-[#C5A028] text-black font-bold px-8 py-3 rounded-none"
+                >
+                  Close
+                </Button>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   )
 }
